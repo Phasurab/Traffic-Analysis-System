@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Vehicle Counting System</title>
+    <!-- Google Fonts for Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Leaflet & Leaflet-Draw CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="background-animation"></div>
+
+    <div class="container glass-panel">
+        <header class="main-header">
+            <div class="logo-container">
+                <img src="assets/bma_logo.png" alt="Bangkok Logo" class="header-logo bma-logo">
+                <img src="assets/nectec_logo.png" alt="NECTEC Logo" class="header-logo nectec-logo">
+            </div>
+            <h1>AI Traffic Analysis System of Bangkok</h1>
+            <p>Upload your traffic video</p>
+        </header>
+
+        <main>
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <form id="uploadForm" class="upload-form">
+                    <div class="file-drop-area" id="videoDropArea">
+                        <span class="choose-file-btn">Choose Video</span>
+                        <span class="file-msg" id="videoMsg">MP4 format</span>
+                        <input class="file-input" type="file" id="videoInput" accept="video/mp4" required>
+                    </div>
+
+                    <!-- Drawing Workspace -->
+                    <div id="drawingWorkspace" class="drawing-workspace hidden">
+                        <h3 style="margin-bottom: 20px; text-align: center;">Interactive Drawing Tool</h3>
+                        <div class="workspace-layout">
+                            <div class="left-sidebar">
+                                <div class="shape-naming vertical-naming">
+                                    <input type="text" id="shapeNameInput" placeholder="Name (e.g. Kaset)" />
+                                    <!-- Leaflet saves implicitly to the map, but we use this to name/commit the current Drawn item -->
+                                    <button type="button" id="btnSaveShape" class="tool-btn success-btn">Save Named
+                                        Shape</button>
+                                </div>
+                                <div class="drawn-itemsList" style="margin-top: 0;">
+                                    <h4 style="margin-bottom: 10px;">Saved Shapes</h4>
+                                    <ul id="shapesList" class="vertical-list"></ul>
+                                </div>
+                                <!-- GeoJSON Validation Badge -->
+                                <div id="geojsonValidation" class="geojson-valid-badge hidden">
+                                    Valid GeoJSON ✓
+                                </div>
+                            </div>
+                            <!-- LEAFLET MAP CONTAINER -->
+                            <div class="canvas-container" id="canvasContainer" style="height: 500px;">
+                                <div id="map" style="width: 100%; height: 100%; background: #000;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GeoJSON Preview Modal -->
+                    <div id="geojsonModal" class="hidden"
+                        style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.5); border-radius: 8px; border: 1px solid #38bdf8; width: 100%;">
+                        <h4 style="color: #38bdf8; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                            <span>Raw GeoJSON Output</span>
+                            <button type="button" id="btnCloseGeo"
+                                style="background: none; border: none; color: white; cursor: pointer;">✕</button>
+                        </h4>
+                        <pre id="geojsonOutputText" class="custom-scroll"
+                            style="max-height: 200px; font-size: 0.85rem; margin-bottom: 10px;"></pre>
+                        <button type="button" id="btnDownloadGeoJSON" class="tool-btn success-btn"
+                            style="width: 100%;">Download format_input.json</button>
+                    </div>
+
+                    <div class="model-select-container" style="text-align: center; margin-top: 10px;">
+                        <label for="modelSelect" style="color: #cbd5e1; font-weight: 600; margin-right: 15px;">Target
+                            Model Type:</label>
+                        <select id="modelSelect" class="primary-btn"
+                            style="padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; background: rgba(15, 23, 42, 0.4); border: 2px solid #38bdf8; color: white;">
+                            <option value="yolo">Ultralytics YOLOv8</option>
+                            <option value="dino">DINOv3 LTDETR</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="primary-btn" id="submitBtn">Run Inference Pipeline</button>
+                </form>
+
+                <!-- Loader -->
+                <div class="loader-container hidden" id="loader">
+                    <div class="spinner"></div>
+                    <p class="loader-text">Processing video with YOLO & ByteTrack... This may take a while.</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressInner"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section hidden" id="resultsSection">
+                <div class="results-header-container">
+                    <h2 class="glow-text gradient-title">✨ Analysis Complete ✨</h2>
+                    <p class="results-subtitle">Here are the tracking inferences from your video.</p>
+                </div>
+                <div class="results-grid">
+                    <div class="video-container">
+                        <h3>Processed Video</h3>
+                        <video id="outputVideo" controls autoplay loop>
+                            Your browser does not support the video tag.
+                        </video>
+                        <a id="downloadVideoBtn" class="download-btn">Download Processed Video</a>
+                    </div>
+
+                    <div class="json-container">
+                        <h3>Vehicle Counts</h3>
+                        <div id="outputJsonDisplay" class="custom-scroll"
+                            style="background: transparent; border: none; padding: 0;"></div>
+                        <div style="display: flex; gap: 10px; margin-top: auto;">
+                            <a id="downloadJsonBtn" class="download-btn" style="flex: 1;">Download JSON</a>
+                            <a id="downloadCsvBtn" class="download-btn"
+                                style="flex: 1; border-color: #10b981; color: #10b981;">Download CSV</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 AI Traffic Analysis System. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Hidden Video element for frame extraction -->
+    <video id="tempVideo" style="display: none;"></video>
+
+    <!-- Leaflet & Leaflet-Draw JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+    <script src="script.js"></script>
+</body>
