@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: vehicle-counting-app
+    ports:
+      - "8000:8000"
+    volumes:
+      # Map the outputs folder back to the host machine
+      # This ensures your SQLite Database and Accumulated CSV Data are NOT lost if the container restarts
+      - ./backend/outputs:/app/backend/outputs
+      - ./backend/uploads:/app/backend/uploads
+      # Map the external DINO model weights (located one directory up) into the container
+      - ../dinov3_convnext_tiny_ltdetr_coco_251113_3a90352e.pt:/app/dinov3_convnext_tiny_ltdetr_coco_251113_3a90352e.pt:ro
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
