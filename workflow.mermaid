@@ -1,21 +1,21 @@
 ```mermaid
 graph TD;
-    A[User Frontend UI] -->|Upload Video & JSON| B(FastAPI Backend)
-    B -->|Saves files & Triggers Pipeline| C{Inference Pipeline}
+    A["User Frontend UI"] -->|Upload Video and JSON| B("FastAPI Backend")
+    B -->|Saves files and Triggers Pipeline| C{"Inference Pipeline"}
     
-    C -->|1. Parse format_input.json| D[Load Polygons & Lane Maps]
-    C -->|2. Frame extraction| E[OpenCV VideoCapture]
-    E --> F[Object Detection & ByteTrack]
+    C -->|1. Parse format_input.json| D["Load Polygons and Lane Maps"]
+    C -->|2. Frame extraction| E["OpenCV VideoCapture"]
+    E --> F["Object Detection and ByteTrack"]
     D --> F
-    F -->|3. Intersection Logic| G[Count Vehicles by Area]
-    G -->|Overlays| H[Draw BBox, Polygons, HUD]
-    H -->|Write Frames| I[Generate Processed .mp4]
-    G -->|Format Mapping| J[Generate output_format.json]
-    G -->|Database Insert| M[(SQLite traffic.db)]
-    G -->|Append Record| N[accumulated_traffic_data.csv]
+    F -->|3. Intersection Logic| G["Count Vehicles by Area"]
+    G -->|Overlays| H["Draw BBox, Polygons, HUD"]
+    H -->|Write Frames| I["Generate Processed .mp4"]
+    G -->|Format Mapping| J["Generate output_format.json"]
+    G -->|Database Insert| M[("SQLite traffic.db")]
+    G -->|Append Record| N["accumulated_traffic_data.csv"]
     
-    I --> K[Frontend Results Render]
+    I --> K["Frontend Results Render"]
     J --> K
     N --> K
-    K -->|User Action| L(Download Files)
+    K -->|User Action| L("Download Files")
 ```
