@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs-banner.jpg" alt="AI Traffic Analysis System" width="100%" />
+</p>
+
 # AI Traffic Analysis System of Bangkok
 
 > **DevOps Highlights**: This application is fully containerized using a lightweight Python-slim Docker image. Orchestration is managed via Docker Compose, utilizing bounded volume mounts to ensure SQLite database persistence and CSV state accumulation across container restarts.
