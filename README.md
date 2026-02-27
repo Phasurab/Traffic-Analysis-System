@@ -4,8 +4,7 @@
 
 This project provides a comprehensive local web application for analyzing traffic videos, extracting vehicle counts based on user-defined polygon areas and trajectory lines, and generating visual and statistical outputs. It is built using FastAPI for the backend and HTML/JS/CSS for the frontend, featuring a responsive, glassmorphism UI with an Emerald Green aesthetic tailored for NECTEC and the Bangkok Metropolitan Administration.
 
-### Demonstration
-*(Click the image below to play the video on YouTube)*<br>
+### Demonstration Video
 [![▶️ Play Video](https://img.youtube.com/vi/0M-j-yNAENg/maxresdefault.jpg)](https://youtu.be/0M-j-yNAENg)
 
 ## 🚀 Quick Start
