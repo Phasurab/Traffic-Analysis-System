@@ -134,7 +134,7 @@ def run_tracking_pipeline(task_id: str, video_path: str, spec_data: dict, out_di
             from huggingface_hub import hf_hub_download
             
             repo_id = "Phasurab/dinov3_convnext_ltdetr_tiny_finetuned_bkktraffic"
-            filename = "dinov3_convnext_tiny_ltdetr_coco_251113_3a90352e.pt"
+            filename = "dinov3_convnext_ltdetr_tiny_finetuned_bkktraffic.pt"
             
             print(f"[INFO] Looking for {filename} from HuggingFace {repo_id}...")
             # This will download the file and cache it locally, or use the cached version if it exists
