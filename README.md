@@ -6,6 +6,8 @@ This project provides a comprehensive local web application for analyzing traffi
 
 ### Demonstration
 
+https://youtu.be/0M-j-yNAENg
+
 ## 🚀 Quick Start
 ```bash
 # Clone the repository
